@@ -6,11 +6,12 @@ const cors = require('cors');
 
 require('dotenv').config();
 
+const chain = '0x1';
 app.get('/getethprice', async (req, res) => {
   try {
     const response = await Moralis.EvmApi.token.getTokenPrice({
       address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      chain: '0x1',
+      chain,
     });
 
     return res.status(200).json(response);
@@ -23,13 +24,60 @@ app.get('/getethprice', async (req, res) => {
 app.get('/address', async (req, res) => {
   try {
     const { query } = req;
-    const chain = '0x1';
     const response =
       await Moralis.EvmApi.transaction.getWalletTransactionsVerbose({
         address: query,
         address,
         chain,
       });
+    return res.status(200).json(response);
+  } catch (e) {
+    console.log(`Something went wrong: ${e}`);
+    return res.status(400).json();
+  }
+});
+
+app.get('/getblockinfo', async (req, res) => {
+  try {
+    const latestBlock = await Moralis.EvmApi.block.getDateToBlock({
+      date: Date.now(),
+      chain,
+    });
+    let blockNumOrParentHash = latestBlock.toJSON().block;
+    let previousBlockInfo = [];
+
+    for (let i = 0; i < 6; i++) {
+      const prevBlockNums = await Moralis.EvmApi.block.getBlock({
+        chain,
+        blockNumberOrHash: blockNumOrParentHash,
+      });
+
+      blockNumOrParentHash = prevBlockNums.toJSON().parent_hash;
+      if (i == 0) {
+        previousBlockInfo.push({
+          transactions: prevBlockNums.toJSON().transactions.map((i) => {
+            return {
+              transactionHash: i.hash,
+              time: i.block_timestamp,
+              fromAddress: i.from_address,
+              toAddress: i.to_address,
+              value: i.value,
+            };
+          }),
+        });
+      }
+      previousBlockInfo.push({
+        blockNumber: prevBlockNums.toJSON().number,
+        totalTransactions: prevBlockNums.toJSON().transaction_count,
+        gasUsed: prevBlockNums.toJSON().gas_used,
+        miner: prevBlockNums.toJSON().miner,
+        time: prevBlockNums.toJSON().timestamp,
+      });
+    }
+    const response = {
+      latestBlock: latestBlock.toJSON().block,
+      previousBlockInfo,
+    };
     return res.status(200).json(response);
   } catch (e) {
     console.log(`Something went wrong: ${e}`);
