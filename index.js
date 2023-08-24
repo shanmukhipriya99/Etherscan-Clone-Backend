@@ -30,10 +30,9 @@ app.get('/getEthPrice', async (req, res) => {
 
 app.get('/address', async (req, res) => {
   try {
-    const { query } = req;
+    const { address } = req.query;
     const response =
       await Moralis.EvmApi.transaction.getWalletTransactionsVerbose({
-        address: query,
         address,
         chain,
       });
