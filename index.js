@@ -6,6 +6,13 @@ const cors = require('cors');
 
 require('dotenv').config();
 
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
 const chain = '0x1';
 app.get('/getEthPrice', async (req, res) => {
   try {
