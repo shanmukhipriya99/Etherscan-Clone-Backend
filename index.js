@@ -7,7 +7,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const chain = '0x1';
-app.get('/getethprice', async (req, res) => {
+app.get('/getEthPrice', async (req, res) => {
   try {
     const response = await Moralis.EvmApi.token.getTokenPrice({
       address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -37,7 +37,7 @@ app.get('/address', async (req, res) => {
   }
 });
 
-app.get('/getblockinfo', async (req, res) => {
+app.get('/getBlockInfo', async (req, res) => {
   try {
     const latestBlock = await Moralis.EvmApi.block.getDateToBlock({
       date: Date.now(),
