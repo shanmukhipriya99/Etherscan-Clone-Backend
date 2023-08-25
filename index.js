@@ -52,7 +52,7 @@ app.get('/getBlockInfo', async (req, res) => {
     let blockNumOrParentHash = latestBlock.toJSON().block;
     let previousBlockInfo = [];
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 1; i++) {
       const prevBlockNums = await Moralis.EvmApi.block.getBlock({
         chain,
         blockNumberOrHash: blockNumOrParentHash,
